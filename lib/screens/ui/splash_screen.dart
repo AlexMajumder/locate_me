@@ -1,16 +1,17 @@
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import 'package:locate_me/screens/ui/home_screen.dart';
 
 class SplashScreen extends StatefulWidget {
   const SplashScreen({super.key});
 
-  static const String name ='/';
+  static const String name = '/';
 
   @override
   State<SplashScreen> createState() => _SplashScreenState();
 }
-class _SplashScreenState extends State<SplashScreen> {
 
+class _SplashScreenState extends State<SplashScreen> {
   @override
   void initState() {
     super.initState();
@@ -19,26 +20,30 @@ class _SplashScreenState extends State<SplashScreen> {
 
   Future<void> _moveToNextScreen() async {
     await Future.delayed(const Duration(seconds: 2));
-     // Get.offAllNamed(HomeScreen.name);
-      Navigator.pushNamedAndRemoveUntil(context, HomeScreen.name, (p)=> true);
-    }
-
+    Get.offAllNamed(HomeScreen.name);
+    //Navigator.pushNamedAndRemoveUntil(context, HomeScreen.name, (p)=> false);
+  }
 
   @override
   Widget build(BuildContext context) {
-    return const Scaffold(
+    return Scaffold(
       body: Padding(
-        padding: EdgeInsets.all(16.0),
+        padding: const EdgeInsets.all(20.0),
         child: Center(
           child: Column(
             children: [
-              Spacer(),
-              Text(
+              const Spacer(),
+              const Text(
                 'Locate Me',
-                style: TextStyle(fontSize: 24, color: Colors.amber),
+                style: TextStyle(
+                    fontSize: 39,
+                    color: Colors.amber,
+                    fontWeight: FontWeight.w600),
               ),
-              Spacer(),
-              CircularProgressIndicator()
+              const SizedBox(height: 10,),
+              Image.asset('assets/images/logo.png'),
+              const Spacer(),
+              const CircularProgressIndicator()
             ],
           ),
         ),

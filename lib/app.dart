@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import 'package:locate_me/screens/ui/home_screen.dart';
 import 'package:locate_me/screens/ui/splash_screen.dart';
 class LocateMeApp extends StatefulWidget {
@@ -11,7 +12,7 @@ class LocateMeApp extends StatefulWidget {
 class _LocateMeAppState extends State<LocateMeApp> {
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
+    return GetMaterialApp(
       initialRoute: SplashScreen.name,
       routes:{
         SplashScreen.name : (context) => const SplashScreen(),
