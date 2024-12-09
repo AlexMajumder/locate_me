@@ -13,7 +13,7 @@ class HomeScreen extends StatelessWidget {
 
     final locationController = Get.put(LocationController());
 
-    locationController.initializeLocationUpdates();
+    locationController.getCurrentLocation();
 
     return Scaffold(
       appBar: AppBar(

@@ -4,8 +4,6 @@ import 'package:geolocator/geolocator.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 
 class LocationController extends GetxController {
-
-
   late GoogleMapController googleMapController;
   Set<Marker> markers = {};
   Set<Polyline> polyLines = {};
@@ -13,7 +11,7 @@ class LocationController extends GetxController {
 
   LatLng initialTarget = const LatLng(22.822566, 89.553544);
 
-  Future<void> initializeLocationUpdates() async {
+  Future<void> realTimeLocationUpdates() async {
     final isGranted = await isLocationPermissionGranted();
     if (isGranted) {
       final isServiceEnabled = await checkGPSServiceEnable();
@@ -25,6 +23,17 @@ class LocationController extends GetxController {
               accuracy: LocationAccuracy.bestForNavigation,
             ),
           ).listen((Position pos) {
+            if (polyLinePoints.length == 2) {
+              Get.showSnackbar(const GetSnackBar(
+                title: 'Successfully created polyline!!',
+                message:
+                    'Now, you see your Polyline. That makes easy to see your Navigate History, after 10S',
+                duration: Duration(seconds: 4),
+                snackPosition: SnackPosition.TOP,
+                backgroundColor: Colors.blueAccent,
+              ));
+            }
+
             animateCameraOnCurrentLocation(pos);
             displayMarker(pos);
             updatePolyline(pos);
@@ -39,7 +48,42 @@ class LocationController extends GetxController {
     } else {
       final result = await requestLocationPermission();
       if (result) {
-        initializeLocationUpdates();
+        realTimeLocationUpdates();
+      } else {
+        Geolocator.openAppSettings();
+      }
+    }
+  }
+
+  Future<void> getCurrentLocation() async {
+    final isGranted = await isLocationPermissionGranted();
+    if (isGranted) {
+      final isServiceEnabled = await checkGPSServiceEnable();
+      if (isServiceEnabled) {
+        Position currentPosition = await Geolocator.getCurrentPosition();
+        animateCameraOnCurrentLocation(currentPosition);
+        displayMarker(currentPosition);
+        Get.showSnackbar(
+          const GetSnackBar(
+            title: 'Hey,Successfully locate Your current location!!',
+            message:
+                "Tap over the marker to show your current Latitude and Longitude",
+            duration: Duration(seconds: 2),
+            snackPosition: SnackPosition.TOP,
+            backgroundColor: Colors.blueAccent,
+          ),
+        );
+
+        update();
+
+        realTimeLocationUpdates();
+      } else {
+        Geolocator.openLocationSettings();
+      }
+    } else {
+      final result = await requestLocationPermission();
+      if (result) {
+        getCurrentLocation();
       } else {
         Geolocator.openAppSettings();
       }
@@ -48,19 +92,19 @@ class LocationController extends GetxController {
 
   Future<bool> isLocationPermissionGranted() async {
     LocationPermission permission = await Geolocator.checkPermission();
-    return permission == LocationPermission.always || permission == LocationPermission.whileInUse;
+    return permission == LocationPermission.always ||
+        permission == LocationPermission.whileInUse;
   }
 
   Future<bool> requestLocationPermission() async {
     LocationPermission permission = await Geolocator.requestPermission();
-    return permission == LocationPermission.always || permission == LocationPermission.whileInUse;
+    return permission == LocationPermission.always ||
+        permission == LocationPermission.whileInUse;
   }
-
 
   Future<bool> checkGPSServiceEnable() async {
     return await Geolocator.isLocationServiceEnabled();
   }
-
 
   void animateCameraOnCurrentLocation(Position currentPosition) {
     googleMapController.animateCamera(
@@ -73,7 +117,6 @@ class LocationController extends GetxController {
     );
   }
 
-
   void displayMarker(Position markerPosition) {
     markers.clear();
     markers.add(
@@ -82,36 +125,20 @@ class LocationController extends GetxController {
         position: LatLng(markerPosition.latitude, markerPosition.longitude),
         infoWindow: InfoWindow(
           title: 'My current location',
-          snippet: 'Lat: ${markerPosition.latitude}, Lng: ${markerPosition.longitude}',
+          snippet:
+              'Lat: ${markerPosition.latitude}, Lng: ${markerPosition.longitude}',
         ),
         icon: BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueGreen),
       ),
     );
   }
 
-
   void updatePolyline(Position currentPosition) {
-    LatLng newPoint = LatLng(currentPosition.latitude, currentPosition.longitude);
+    LatLng newPoint =
+        LatLng(currentPosition.latitude, currentPosition.longitude);
     polyLinePoints.add(newPoint);
 
-    if(polyLinePoints.length ==1){
-      Get.showSnackbar(const GetSnackBar(
-        title: 'Hey,Successfully locate Your current location!!',
-        message: "Now, you see your Location as a Marker and It's syncs automatically with your current location",
-        duration: Duration(seconds: 4),
-        snackPosition: SnackPosition.TOP,
-        backgroundColor: Colors.blueAccent,
-      ));
-    }
-    if(polyLinePoints.length ==2){
-      Get.showSnackbar(const GetSnackBar(
-        title: 'Polyline created!!',
-        message: 'Now, you see your Polyline. That makes easy to see your Navigate History',
-        duration: Duration(seconds: 4),
-        snackPosition: SnackPosition.TOP,
-        backgroundColor: Colors.blueAccent,
-      ));
-    }
+    if (polyLinePoints.length == 1) {}
 
     Polyline polyline = Polyline(
       polylineId: const PolylineId('location-history'),
