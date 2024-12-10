@@ -17,7 +17,7 @@ class HomeScreen extends StatelessWidget {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Locate Me'),
+        title: const Text('Real-Time Location Tracker'),
       ),
       body: GetBuilder<LocationController>(
         builder: (controller) {
