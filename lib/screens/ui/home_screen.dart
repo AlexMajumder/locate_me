@@ -27,6 +27,7 @@ class HomeScreen extends StatelessWidget {
               zoom: 9,
               target: controller.initialTarget,
             ),
+            circles: controller.circles,
             markers: controller.markers,
             polylines: controller.polyLines,
             zoomControlsEnabled: true,

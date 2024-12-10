@@ -6,6 +6,7 @@ import 'package:google_maps_flutter/google_maps_flutter.dart';
 class LocationController extends GetxController {
   late GoogleMapController googleMapController;
   Set<Marker> markers = {};
+  Set<Circle> circles = {};
   Set<Polyline> polyLines = {};
   List<LatLng> polyLinePoints = [];
 
@@ -19,7 +20,7 @@ class LocationController extends GetxController {
         try {
           Geolocator.getPositionStream(
             locationSettings: const LocationSettings(
-              timeLimit: Duration(seconds: 30),
+              timeLimit: Duration(seconds: 10),
               accuracy: LocationAccuracy.bestForNavigation,
             ),
           ).listen((Position pos) {
@@ -36,6 +37,7 @@ class LocationController extends GetxController {
 
             animateCameraOnCurrentLocation(pos);
             displayMarker(pos);
+            displayCircle(pos);
             updatePolyline(pos);
             update();
           });
@@ -61,8 +63,11 @@ class LocationController extends GetxController {
       final isServiceEnabled = await checkGPSServiceEnable();
       if (isServiceEnabled) {
         Position currentPosition = await Geolocator.getCurrentPosition();
+
         animateCameraOnCurrentLocation(currentPosition);
         displayMarker(currentPosition);
+        displayCircle(currentPosition);
+
         Get.showSnackbar(
           const GetSnackBar(
             title: 'Hey,Successfully locate Your current location!!',
@@ -128,7 +133,22 @@ class LocationController extends GetxController {
           snippet:
               'Lat: ${markerPosition.latitude}, Lng: ${markerPosition.longitude}',
         ),
-        icon: BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueGreen),
+        icon: BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueViolet),
+      ),
+    );
+  }
+
+  void displayCircle(Position circlePosition) {
+    circles.clear();
+    circles.add(
+      Circle(
+        circleId: const CircleId('MyLocation'),
+        fillColor: Colors.blue.withOpacity(.2),
+        center: LatLng(circlePosition.latitude, circlePosition.longitude),
+        radius: 80,
+        strokeColor: Colors.red.withOpacity(.6),
+        strokeWidth: 1,
+        visible: true,
       ),
     );
   }
